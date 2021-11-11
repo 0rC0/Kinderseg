@@ -1,0 +1,14 @@
+#!/bin/bash
+
+base_dir="/home/orco/data/kinderseg"
+subs_dir="$base_dir/HBM_MRI/derivatives/fastsurfer"
+code_dir="$base_dir/code"
+
+cd $subs_dir
+subs=($( ls -1d sub*))
+export SUBJECTS_DIR=$subs_dir # do I need this?
+
+cd $code_dir
+asegstats2table --common-segs --meas volume --tablefile ./HBM_fastsurfer_aseg.volume.stats.dat --statsfile=aseg.stats --skip --subjects ${subs[@]}
+
+exit
