@@ -1,0 +1,59 @@
+#!/bin/bash
+
+## Install enviroment:
+# conda create -n fastsurfer
+# conda activate fastsurfer
+# conda install pytorch torchvision cudatoolkit=11 cudnn -c pytorch
+# conda install -c conda-forge numpy scipy scikit-image cycler decorator h5py imageio kiwisolver matplotlib nibabel Pillow pyparsing PyWavelets scikit-image six
+
+#Fastsurfer needs freesurfer 6
+export FREESURFER_HOME="/usr/local/freesurfer_6"
+#/fast/users/dellorca_c/work/freesurfer-6
+source $FREESURFER_HOME/SetUpFreeSurfer.sh
+
+bids_root="/home/orco/data/kinderseg/Rasmussen"
+
+der_dir="${bids_root}/derivatives/fastsurfer"
+export FASTSURFER_HOME="/home/orco/software/FastSurfer"
+
+#Grab subject IDs
+cd $bids_root
+subs=($( ls -1d sub* ))
+echo ${subs[@]}
+
+mkdir -p $der_dir
+
+for sub in ${subs[@]}
+do
+  # grab sessions
+  cd $bids_root/$sub
+  sess=($( ls -1d ses* ))
+  cd $der_dir
+  mkdir -p $sub
+  cd $sub
+
+  for ses in ${sess[@]}
+  do
+    echo "$sub $ses"
+    mkdir -p $ses
+    cd $ses
+    # If doesnt exist convert nii to mgz
+    if [ ! -e ${der_dir}/${sub}/${ses}/orig.mgz ]
+    then
+      mri_convert ${bids_root}/${sub}/${ses}/anat/${sub}_${ses}_T1w.nii.gz ${der_dir}/${sub}/${ses}/orig.mgz
+    fi
+    if [ ! -e "${der_dir}/${sub}/${ses}/mri/aparc.DKTatlas+aseg.deep.mgz" ]
+    then
+      export SUBJECTS_DIR=${der_dir}/${sub}/${ses}
+      $FASTSURFER_HOME/run_fastsurfer.sh --seg_only \
+                          --sd ${der_dir}/${sub}/ \
+                          --sid $ses \
+                          --t1 ${der_dir}/${sub}/${ses}/orig.mgz \
+                          --parallel --threads 20 --vol_segstats
+    else
+      echo "$sub seg found! skipping"
+    fi
+
+    cd ..
+  done
+done
