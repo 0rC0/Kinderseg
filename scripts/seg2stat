@@ -1,0 +1,60 @@
+#!/bin/bash
+
+## Install enviroment:
+# conda create -n fastsurfer
+# conda activate fastsurfer
+# conda install pytorch torchvision cudatoolkit=11 cudnn -c pytorch
+# conda install -c conda-forge numpy scipy scikit-image cycler decorator h5py imageio kiwisolver matplotlib nibabel Pillow pyparsing PyWavelets scikit-image six
+
+#Fastsurfer needs freesurfer 6
+export FREESURFER_HOME="/usr/local/freesurfer_6"
+#/fast/users/dellorca_c/work/freesurfer-6
+source $FREESURFER_HOME/SetUpFreeSurfer.sh
+
+bids_root="/home/orco/data/kinderseg/Rasmussen"
+
+der_dir="${bids_root}/derivatives/fastsurfer"
+export FASTSURFER_HOME="/home/orco/software/FastSurfer"
+
+#Grab subject IDs
+cd $bids_root
+subs=($( ls -1d sub* ))
+#subs=( 'sub-R002' )
+echo ${subs[@]}
+
+mkdir -p $der_dir
+N=32
+for sub in ${subs[@]}
+do
+  ((i=i%N)); ((i++==0)) && wait
+  # grab sessions
+  cd $bids_root/$sub
+  sess=($( ls -1d ses* ))
+  #sess=( 'ses-04' )
+  cd $der_dir
+  mkdir -p $sub
+  cd $sub
+
+  for ses in ${sess[@]}
+  do
+    (( i=i%N )); (( i++==0 )) && wait
+    echo "$sub $ses"
+    mkdir -p $ses
+    cd $ses
+      export SUBJECTS_DIR=${der_dir}/${sub}
+      mri_segstats --seg mri/aparc.DKTatlas+aseg.deep.mgz \
+                    --sum stats/aparc.DKTatlas+aseg.deep.volume.stats \
+                    --pv mri/norm.mgz --empty --brainmask mri/brainmask.mgz --brain-vol-from-seg \
+                    --excludeid 0 --subcortgray --in mri/norm.mgz --in-intensity-name norm \
+                    --in-intensity-units MR --etiv --totalgray --supratent --surf-wm-vol --surf-ctx-vol\
+                    --id 2, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 24, 26, 28, 31, 41, 43, 44, 46, \
+                         47, 49, 50, 51, 52, 53, 54, 58, 60, 63, 77, 251, 252, 253, 254, 255, 1002, 1003, \
+                         1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1018, \
+                         1019, 1020, 1021, 1022, 1023, 1024, 1025, 1026, 1027, 1028, 1029, 1030, 1031, 1034, \
+                         1035, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, \
+                         2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, \
+                         2030, 2031, 2034, 2035 --ctab /$FREESURFER_HOME/FreeSurferColorLUT.txt \
+                         --subject ${ses} &
+    cd ..
+  done
+done

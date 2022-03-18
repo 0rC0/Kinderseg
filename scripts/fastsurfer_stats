@@ -1,0 +1,25 @@
+#!/bin/bash
+
+curr_dir=$PWD
+der_dir="/home/orco/data/kinderseg/Rasmussen/derivatives/fastsurfer"
+cd $der_dir
+
+subs=($( ls -1d sub*))
+
+for i in ${subs[@]}
+do
+  echo $i
+  cd $i
+  export SUBJECTS_DIR=$PWD
+  ses=($( ls -1d ses*))
+  asegstats2table --common-segs --meas volume --skip --all-segs\
+                  --tablefile $curr_dir/vol_${i}.csv \
+                  --statsfile=aparc.DKTatlas+aseg.deep.volume.stats \
+                  --subjects "${ses[@]}"
+
+  #asegstats2table --common-segs --meas volume --skip \
+  #                 --tablefile ./ND_fastsurfer_brainvol.csv \
+  #                 --statsfile=brainvol.stats \
+  #                 --subjects "${subs[@]}"
+  cd ..
+done
