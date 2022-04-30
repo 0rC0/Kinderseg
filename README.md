@@ -1,3 +1,3 @@
 # Kinderseg
 
-Code for a submitted, not yet published paper.
+Example code for a submitted, not yet published paper.
