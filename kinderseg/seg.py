@@ -38,7 +38,7 @@ def main(args):
     #subprocess.Popen(fastsurfer_cmd.split())
 
     # calculate etiv
-    etiv_cmd = 'mri_segstats --etiv-only --subject {sid} | grep eTIV  | awk \'{print $4}\''.format(sid=sid)
+    etiv_cmd = "mri_segstats --etiv-only --subject {sid} | grep eTIV  | awk '{print $4}'".format(sid=sid)
     etiv = subprocess.Popen([etiv_cmd], shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     etiv = etiv.stdout.read()
     #print('etiv', float(etiv))
