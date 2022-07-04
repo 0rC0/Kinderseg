@@ -241,7 +241,7 @@ scale_color_viridis_d('IDs', option='plasma', begin=0.4)+
 
 pr <- ggplot(tmp_normz, aes(x=rois, y=z_score), alpha=0.4, width = 0.25) +
     geom_link(aes(x = rois, xend=rois, y = -3, yend=+3, colour = stat(index)), lineend = "round", size = 10, show.legend=F)+
-    geom_jitter(data=tmp_normz%>% filter(LR=='R'), aes(x=rois, y=z_score), alpha=0.4, width = 0.25)+
+    geom_jitter(data=tmp_normz %>% filter(LR=='R'), aes(x=rois, y=z_score), alpha=0.4, width = 0.25)+
     new_scale_color() +
     ylim(-3,+3)
 
