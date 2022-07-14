@@ -21,15 +21,34 @@ def age_from_dicoms(dp):
                         f.AcquisitionDate)
 
 
-def nii2mgz(nii_path):
+def nii2mgz(nii_path, mgz_filename='orig.mgz'):
     """
     Convert nifti to mgz, generate an orig.mgz in the same directory of the .nii
+    :param mgz_filename: str, output mgz filename
     :param nii_path: path of the .nii file
     :return: path and filename for the mgz file
     """
     path = os.path.dirname(nii_path)
     nii_obj = nib.load(nii_path)
-    mgh_obg = nib.MGHImage(nii_obj.get_fdata(), affine=nii_obj.affine, header=nii_obj.header)
+    mgh_obg = nib.MGHImage(nii_obj.get_fdata(),
+                           affine=nii_obj.affine,
+                           header=nii_obj.header)
+    dest_path = os.path.join(path, mgz_filename)
+    nib.save(mgh_obg, dest_path)
+    return dest_path
+
+
+def mgz2nii(mgz_path, nii_filename='nii.nii'):
+    """
+    Convert nifti to mgz, generate an orig.mgz in the same directory of the .nii
+    :param nii_path: path of the .nii file
+    :return: path and filename for the mgz file
+    """
+    path = os.path.dirname(mgz_path)
+    mgz_obj = nib.load(mgz_path)
+    mgh_obg = nib.Nifti1Image(mgz_obj.get_fdata(),
+                              affine=mgz_obj.affine,
+                              header=mgz_obj.header)
     dest_path = os.path.join(path, 'orig.mgz')
     nib.save(mgh_obg, dest_path)
     return dest_path
@@ -59,3 +78,4 @@ def find_outliers(df, var='both'):
         # except:
         #         print('Skip: ', col)
     return d
+
