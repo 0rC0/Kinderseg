@@ -1,8 +1,7 @@
 #!/usr/bin/env Rscript
 
 library(ggplot2)
-library(tidyverse)
-library(reshape2)
+#library(reshape2)
 library(hrbrthemes)
 library(RColorBrewer)
 library(plyr)
@@ -11,6 +10,8 @@ library(viridis)
 library(ggnewscale)
 library(ggforce)
 library(cowplot)
+library(tidyverse)
+
 
 
 args <- commandArgs(trailingOnly=TRUE)
@@ -160,17 +161,12 @@ data_norm_perc <- data_norm_perc %>% mutate(percentile=factor(percentile))
 
 scatterplot <- ggplot(normdata_tmp, aes(x=age, y=Volume, group=ROI, shape=LR)) +
     geom_point(alpha=0.2) +
-#    geom_smooth(data=data_norm_p50, aes(x=age, y=Volume), se=F) +
-#    geom_smooth(data=data_norm_p95, aes(x=age, y=Volume), se=F) +
-#    geom_smooth(data=data_norm_p05, aes(x=age, y=Volume), se=F) +
-geom_smooth(data=data_norm_perc, aes(x=age, y=Volume, group=percentile), color='black', se=F) +
-scale_color_viridis_d(begin=0.4, end=0.8)+
-new_scale_color()  +
-
-geom_point(data=data_s_tmp, aes(x=age, y=Volume, shape=LR, color=ids), size=5) +
-scale_color_viridis_d(option='plasma', begin=0.4, end=0.8)+
-
-    facet_wrap(vars(ROI), scales = "free") +
+    geom_smooth(data=data_norm_perc, aes(x=age, y=Volume, group=percentile), color='black', se=F) +
+    scale_color_viridis_d(begin=0.4, end=0.8)+
+    new_scale_color()  +
+    geom_point(data=data_s_tmp, aes(x=age, y=Volume, shape=LR, color=ids), size=5) +
+    scale_color_viridis_d(option='plasma', begin=0.4, end=0.8)+
+    facet_wrap(vars(ROI), scales = "free_y") +
     theme_bw() +
     labs(x='Age', y='Volume') +
     theme(text = element_text(size=20))

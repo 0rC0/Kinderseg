@@ -20,7 +20,8 @@ def main(args):
     t1_path = os.path.abspath(args[0])
     dcm_path = args[1]
     sid = os.path.basename(t1_path) + '.fastsurfer'
-    sd = '/'.join(t1_path.split('/')[:-2])
+    #sd = '/'.join(t1_path.split('/')[:-2])
+    sd = os.path.dirname(t1_path)
     os.environ['SUBJECTS_DIR'] = sd
     # 0) convert T1 to mgz for fastsurfer
     mgz = nii2mgz(t1_path)
@@ -34,14 +35,16 @@ def main(args):
                                                                            subject_dir=sd,
                                                                            subject_id=sid,
                                                                            mgz_path=mgz)
-    #print(fastsurfer_cmd)
+    print(fastsurfer_cmd)
     #subprocess.Popen(fastsurfer_cmd.split())
 
     # calculate etiv
-    etiv_cmd = "mri_segstats --etiv-only --subject {sid} | grep eTIV  | awk '{print $4}'".format(sid=sid)
+    etiv_cmd = "mri_segstats --etiv-only --subject  {sid} | grep eTIV ".format(sid=sid)
+    print(etiv_cmd)
     etiv = subprocess.Popen([etiv_cmd], shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     etiv = etiv.stdout.read()
-    #print('etiv', float(etiv))
+    etiv = str(etiv).split(' ')[3]
+    print('etiv', float(etiv))
     # 2) Extract data
     patient_age = age_from_dicoms(os.path.join(dcm_path, os.listdir(dcm_path)[0])) #ToDo: possible list out of range
     print('patient age: {age}'.format(age=patient_age))
