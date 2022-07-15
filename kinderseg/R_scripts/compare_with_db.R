@@ -172,7 +172,7 @@ scatterplot <- ggplot(normdata_tmp, aes(x=age, y=Volume, group=ROI, shape=LR)) +
     theme(text = element_text(size=20))
     #theme(legend.position = 'none')
 
-print('save scatterplot')
+print('save scatterplot in scatteplot.png')
 ggsave(paste(dirname(table_path), 'scatterplot.png', sep='/'), plot=scatterplot, width=600, height=300, units='mm')
 
 lnormdata <- normdata %>% filter(LR=='L')
@@ -256,8 +256,8 @@ scale_color_viridis_d('IDs', option='plasma', begin=0.4)+
          text = element_text(size=16))
 
 sliding_plot <- plot_grid(pr, pl, labels = c('R', 'L'), label_size = 20)
-print('saving_sliding_plot')
+print('saving_sliding_plot in slidingplot.png')
 
-ggsave(paste(dirname(table_path), 'scatterplot.png', sep='/'), plot=sliding_plot, width=600, height=300, units='mm')
+ggsave(paste(dirname(table_path), 'slidingplot.png', sep='/'), plot=sliding_plot, width=600, height=300, units='mm')
 
 
